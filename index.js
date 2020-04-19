@@ -25,9 +25,32 @@ let persons = [
   },
 ];
 
+const generateId = () => Math.floor(Math.random() * 100000);
+
+app.get("/info", (req, res) => {
+  const date = new Date();
+  const html = `
+    <p>Phonebook has info for ${persons.length} people</p>
+    <p>${date.toDateString()} ${date.toTimeString()}</p>
+  `;
+
+  res.send(html);
+});
+
 app.get("/api/persons", (req, res) => {
   console.log("api/persons");
   res.json(persons);
+});
+
+app.post("/api/persons", (req, res) => {
+  const body = req.body;
+  const person = {
+    name: body.name,
+    number: body.number,
+    id: generateId(),
+  };
+  persons = persons.concat(person);
+  res.json(person);
 });
 
 app.get("/api/persons/:id", (req, res) => {
@@ -47,18 +70,8 @@ app.delete("/api/persons/:id", (req, res) => {
   if (person) {
     persons = persons.filter((person) => person.id !== id);
   }
-  
+
   res.status(204).end();
-});
-
-app.get("/info", (req, res) => {
-  const date = new Date();
-  const html = `
-    <p>Phonebook has info for ${persons.length} people</p>
-    <p>${date.toDateString()} ${date.toTimeString()}</p>
-  `;
-
-  res.send(html);
 });
 
 const PORT = 3001;
