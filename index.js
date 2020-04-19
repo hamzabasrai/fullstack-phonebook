@@ -1,6 +1,9 @@
 const express = require("express");
+const morgan = require("morgan");
+
 const app = express();
 app.use(express.json());
+app.use(morgan("tiny"));
 
 let persons = [
   {
@@ -38,7 +41,6 @@ app.get("/info", (req, res) => {
 });
 
 app.get("/api/persons", (req, res) => {
-  console.log("api/persons");
   res.json(persons);
 });
 
@@ -61,7 +63,7 @@ app.post("/api/persons", (req, res) => {
     number: body.number,
     id: generateId(),
   };
-  
+
   persons = persons.concat(person);
   res.json(person);
 });
