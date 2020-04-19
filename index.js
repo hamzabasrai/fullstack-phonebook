@@ -44,11 +44,24 @@ app.get("/api/persons", (req, res) => {
 
 app.post("/api/persons", (req, res) => {
   const body = req.body;
+
+  if (!body.name) {
+    return res.status(400).send({ error: "Name field is required" });
+  } else if (!body.number) {
+    return res.status(400).send({ error: "Number field is required" });
+  }
+
+  const alreadyExists = persons.some((person) => person.name === body.name);
+  if (alreadyExists) {
+    return res.status(400).send({ error: "Name field must be unique" });
+  }
+
   const person = {
     name: body.name,
     number: body.number,
     id: generateId(),
   };
+  
   persons = persons.concat(person);
   res.json(person);
 });
