@@ -26,8 +26,18 @@ let notes = [
 ];
 
 app.get("/api/persons", (req, res) => {
-  console.log('api/persons');
+  console.log("api/persons");
   res.json(notes);
+});
+
+app.get("/info", (req, res) => {
+  const date = new Date();
+  const html = `
+    <p>Phonebook has info for ${notes.length} people</p>
+    <p>${date.toDateString()} ${date.toTimeString()}</p>
+  `;
+
+  res.send(html);
 });
 
 const PORT = 3001;
