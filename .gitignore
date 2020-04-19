@@ -1,0 +1,14 @@
+# Useful .gitignore config
+
+# Linux
+*~
+
+# Node
+node_modules
+npm_debug.log
+
+#Idea
+.idea/
+
+#Build
+build/
