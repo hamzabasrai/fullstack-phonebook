@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node server",
-    "dev": "nodemon server"
+    "dev": "nodemon server",
+    "build": "cd phonebook-ui/ && yarn install && yarn run build"
   },
   "author": "Hamza Basrai",
   "license": "MIT",
