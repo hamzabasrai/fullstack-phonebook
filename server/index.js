@@ -1,3 +1,4 @@
+const path = require("path");
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
@@ -34,6 +35,9 @@ let persons = [
 ];
 
 const generateId = () => Math.floor(Math.random() * 100000);
+
+// Priority serve any static files.
+app.use(express.static(path.resolve(__dirname, "../phonebook-ui/build")));
 
 app.get("/info", (req, res) => {
   const date = new Date();
@@ -92,6 +96,11 @@ app.delete("/api/persons/:id", (req, res) => {
   }
 
   res.status(204).end();
+});
+
+// All remaining requests return the React app, so it can handle routing.
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "../phonebook-ui/build", "index.html"));
 });
 
 const PORT = process.env.PORT || 3001;
