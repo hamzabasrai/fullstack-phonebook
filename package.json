@@ -4,8 +4,8 @@
   "description": "Express API for Phonebook application",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js"
   },
   "author": "Hamza Basrai",
   "license": "MIT",
@@ -15,5 +15,9 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.3"
-  }
+  },
+  "cacheDirectories": [
+    "node_modules",
+    "phonebook-ui/node_modules"
+  ]
 }
