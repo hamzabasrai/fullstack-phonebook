@@ -4,12 +4,13 @@
   "description": "Express API for Phonebook application",
   "main": "index.js",
   "scripts": {
-    "start": "node server/index.js",
-    "dev": "nodemon server/index.js"
+    "start": "node server",
+    "dev": "nodemon server"
   },
   "author": "Hamza Basrai",
   "license": "MIT",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "morgan": "^1.10.0"
   },
