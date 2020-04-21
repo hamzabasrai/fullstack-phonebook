@@ -3,10 +3,10 @@ const path = require("path");
 const express = require("express");
 
 // Middleware
-const morgan = require("morgan");
+const logger = require("morgan");
 const cors = require("cors");
 const errorHandler = require("./error");
-morgan.token("body", (req, res) => JSON.stringify(req.body));
+logger.token("body", (req, res) => JSON.stringify(req.body));
 
 // Models
 const Person = require("./models/person");
@@ -15,22 +15,23 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(
-  morgan(":method :url :status :res[content-length] - :response-time ms :body")
+  logger(":method :url :status :res[content-length] - :response-time ms :body")
 );
-
-const generateId = () => Math.floor(Math.random() * 100000);
 
 // Priority serve any static files.
 app.use(express.static(path.resolve(__dirname, "../phonebook-ui/build")));
 
+// GET Endpoints
 app.get("/info", (req, res) => {
-  const date = new Date();
-  const html = `
-    <p>Phonebook has info for ${persons.length} people</p>
-    <p>${date.toDateString()} ${date.toTimeString()}</p>
-  `;
-
-  res.send(html);
+  Person.find().then((result) => {
+    const size = result.length;
+    const date = new Date();
+    const html = `
+      <p>Phonebook has info for ${size} ${size > 1 ? "people" : "person"}</p>
+      <p>${date.toDateString()} ${date.toTimeString()}</p>
+    `;
+    res.send(html);
+  });
 });
 
 app.get("/api/persons", (req, res, next) => {
@@ -42,6 +43,19 @@ app.get("/api/persons", (req, res, next) => {
     .catch((error) => next(error));
 });
 
+app.get("/api/persons/:id", (req, res, next) => {
+  Person.findById(req.params.id)
+    .then((person) => {
+      if (person) {
+        res.json(person);
+      } else {
+        return res.status(404).send({ error: "Person does not exist" });
+      }
+    })
+    .catch((error) => next(error));
+});
+
+// POST Endpoints
 app.post("/api/persons", (req, res, next) => {
   const body = req.body;
 
@@ -64,6 +78,7 @@ app.post("/api/persons", (req, res, next) => {
     .catch((error) => next(error));
 });
 
+// PUT Endpoints
 app.put("/api/persons/:id", (req, res, next) => {
   const body = req.body;
 
@@ -80,17 +95,7 @@ app.put("/api/persons/:id", (req, res, next) => {
     .catch((error) => next(error));
 });
 
-app.get("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const person = persons.find((person) => person.id === id);
-
-  if (person) {
-    res.json(person);
-  } else {
-    return res.status(404).send({ error: "Person does not exist" });
-  }
-});
-
+// DELETE Endpoints
 app.delete("/api/persons/:id", (req, res, next) => {
   Person.findByIdAndRemove(req.params.id)
     .then((result) => {
