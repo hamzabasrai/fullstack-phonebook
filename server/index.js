@@ -59,12 +59,6 @@ app.get("/api/persons/:id", (req, res, next) => {
 app.post("/api/persons", (req, res, next) => {
   const body = req.body;
 
-  if (!body.name) {
-    return res.status(400).send({ error: "Name field is required" });
-  } else if (!body.number) {
-    return res.status(400).send({ error: "Number field is required" });
-  }
-
   const person = new Person({
     name: body.name,
     number: body.number,
