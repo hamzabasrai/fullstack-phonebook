@@ -8,7 +8,7 @@ const cors = require("cors");
 morgan.token("body", (req, res) => JSON.stringify(req.body));
 
 // Models
-const Person = require("./models/person")
+const Person = require("./models/person");
 
 const app = express();
 app.use(cors());
@@ -36,7 +36,7 @@ app.get("/api/persons", (req, res) => {
   Person.find().then((result) => {
     console.log(result);
     res.json(result);
-  })
+  });
 });
 
 app.post("/api/persons", (req, res) => {
@@ -48,19 +48,14 @@ app.post("/api/persons", (req, res) => {
     return res.status(400).send({ error: "Number field is required" });
   }
 
-  const alreadyExists = persons.some((person) => person.name === body.name);
-  if (alreadyExists) {
-    return res.status(400).send({ error: "Name field must be unique" });
-  }
-
-  const person = {
+  const person = new Person({
     name: body.name,
     number: body.number,
-    id: generateId(),
-  };
+  });
 
-  persons = persons.concat(person);
-  res.json(person);
+  person.save().then((savedPerson) => {
+    res.json(savedPerson);
+  });
 });
 
 app.get("/api/persons/:id", (req, res) => {
@@ -89,7 +84,7 @@ app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "../phonebook-ui/build", "index.html"));
 });
 
-const PORT = process.env.PORT
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
