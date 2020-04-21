@@ -1,8 +1,14 @@
+require("dotenv").config();
 const path = require("path");
 const express = require("express");
+
+// Middleware
 const morgan = require("morgan");
 const cors = require("cors");
 morgan.token("body", (req, res) => JSON.stringify(req.body));
+
+// Models
+const Person = require("./models/person")
 
 const app = express();
 app.use(cors());
@@ -10,29 +16,6 @@ app.use(express.json());
 app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body")
 );
-
-let persons = [
-  {
-    name: "Arto Hellas",
-    number: "040-123456",
-    id: 1,
-  },
-  {
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-    id: 2,
-  },
-  {
-    name: "Dan Abramov",
-    number: "12-43-234345",
-    id: 3,
-  },
-  {
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-    id: 4,
-  },
-];
 
 const generateId = () => Math.floor(Math.random() * 100000);
 
@@ -50,7 +33,10 @@ app.get("/info", (req, res) => {
 });
 
 app.get("/api/persons", (req, res) => {
-  res.json(persons);
+  Person.find().then((result) => {
+    console.log(result);
+    res.json(result);
+  })
 });
 
 app.post("/api/persons", (req, res) => {
@@ -103,7 +89,7 @@ app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "../phonebook-ui/build", "index.html"));
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
