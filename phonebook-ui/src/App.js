@@ -55,11 +55,30 @@ const App = () => {
       return;
     }
     const person = { name: newName, number: newNumber };
-    const newPerson = await personService.create(person);
-    setPersons(persons.concat(newPerson));
-    setNewName("");
-    setNewNumber("");
-    showMessage(`${newPerson.name} was added successfully`, false);
+    try {
+      const newPerson = await personService.create(person);
+      setPersons(persons.concat(newPerson));
+      setNewName("");
+      setNewNumber("");
+      showMessage(`${newPerson.name} was added successfully`, false);
+    } catch (error) {
+      const message = error.response.data.error;
+      const nameError = message.includes("name");
+      const numberError = message.includes("number");
+
+      if (nameError && numberError) {
+        showMessage(
+          `Name ${newName} is too short (3). Number ${newNumber} is too short (8)`,
+          true
+        );
+      } else if (nameError && !numberError) {
+        showMessage(`Name ${newName} is too short (3).`, true);
+      } else if (!nameError && numberError) {
+        showMessage(`Number ${newNumber} is too short (8)`, true);
+      } else {
+        showMessage(`Unknown Error`, true);
+      }
+    }
   };
 
   const handleNameChange = (event) => {
@@ -74,20 +93,18 @@ const App = () => {
     setFilter(event.target.value);
   };
 
-  const handleDelete = (toDelete) => {
-    personService
-      .remove(toDelete.id)
-      .then((_) => {
-        showMessage(`${toDelete.name} was deleted successfully`, false);
-        setPersons(persons.filter((person) => person.id !== toDelete.id));
-      })
-      .catch((error) => {
-        showMessage(
-          `${toDelete.name} has already been deleted from server`,
-          true
-        );
-        setPersons(persons.filter((person) => person.id !== toDelete.id));
-      });
+  const handleDelete = async (toDelete) => {
+    try {
+      await personService.remove(toDelete.id);
+      showMessage(`${toDelete.name} was deleted successfully`, false);
+      setPersons(persons.filter((person) => person.id !== toDelete.id));
+    } catch (error) {
+      showMessage(
+        `${toDelete.name} has already been deleted from server`,
+        true
+      );
+      setPersons(persons.filter((person) => person.id !== toDelete.id));
+    }
   };
 
   const personsToShow =
