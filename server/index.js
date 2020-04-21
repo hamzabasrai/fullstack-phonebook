@@ -5,6 +5,7 @@ const express = require("express");
 // Middleware
 const morgan = require("morgan");
 const cors = require("cors");
+const errorHandler = require("./error");
 morgan.token("body", (req, res) => JSON.stringify(req.body));
 
 // Models
@@ -32,14 +33,16 @@ app.get("/info", (req, res) => {
   res.send(html);
 });
 
-app.get("/api/persons", (req, res) => {
-  Person.find().then((result) => {
-    console.log(result);
-    res.json(result);
-  });
+app.get("/api/persons", (req, res, next) => {
+  Person.find()
+    .then((result) => {
+      console.log(result);
+      res.json(result);
+    })
+    .catch((error) => next(error));
 });
 
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", (req, res, next) => {
   const body = req.body;
 
   if (!body.name) {
@@ -53,9 +56,12 @@ app.post("/api/persons", (req, res) => {
     number: body.number,
   });
 
-  person.save().then((savedPerson) => {
-    res.json(savedPerson);
-  });
+  person
+    .save()
+    .then((savedPerson) => {
+      res.json(savedPerson);
+    })
+    .catch((error) => next(error));
 });
 
 app.get("/api/persons/:id", (req, res) => {
@@ -69,18 +75,20 @@ app.get("/api/persons/:id", (req, res) => {
   }
 });
 
-app.delete("/api/persons/:id", (req, res) => {
+app.delete("/api/persons/:id", (req, res, next) => {
   Person.findByIdAndRemove(req.params.id)
     .then((result) => {
       res.status(204).end();
     })
-    .catch((error) => console.log(error));
+    .catch((error) => next(error));
 });
 
 // All remaining requests return the React app, so it can handle routing.
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "../phonebook-ui/build", "index.html"));
 });
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
